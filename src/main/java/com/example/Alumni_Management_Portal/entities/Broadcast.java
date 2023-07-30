@@ -10,9 +10,13 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
-public class User {
+public class Broadcast {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    private String type;
+    private String title;
+    private String description;
 }

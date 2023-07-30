@@ -1,23 +1,22 @@
 package com.example.Alumni_Management_Portal.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
-@Entity
+//@Entity
 @Setter
 @Getter
 public class EventAttendance {
 
-    @Id
+//    @Id
     @OneToOne
+    @JoinColumn(name = "event_id")
     private Event event;
 
     @OneToMany
+    @JoinColumn(name = "attendance_id")
     private List<User> attendance;
 }

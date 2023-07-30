@@ -18,5 +18,5 @@ public class EventDto {
     private Date endDate;
     private String type;
 
-    private User event_creator;
+    private User eventCreator;
 }

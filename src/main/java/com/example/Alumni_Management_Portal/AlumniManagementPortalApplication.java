@@ -13,7 +13,11 @@ public class AlumniManagementPortalApplication {
 	}
 
 	@Bean
+<<<<<<< HEAD
 	public ModelMapper modelMapper(){
+=======
+	public ModelMapper modelMapper() {
+>>>>>>> 91c2f2e415dcf7d1640edc56f0dd721d92dcf25e
 		return new ModelMapper();
 	}
 }

@@ -3,13 +3,12 @@ package com.example.Alumni_Management_Portal.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-
 
 @Entity
 @Setter
 @Getter
 public class Contact {
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;

@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Contact {
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;

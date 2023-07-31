@@ -3,10 +3,6 @@ package com.example.Alumni_Management_Portal.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-<<<<<<< HEAD
-=======
-
->>>>>>> 91c2f2e415dcf7d1640edc56f0dd721d92dcf25e
 
 @Entity
 @Setter

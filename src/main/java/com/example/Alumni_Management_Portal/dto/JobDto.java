@@ -15,6 +15,6 @@ public class JobDto {
     private String description;
     private String location;
     private String type;
-    private User job_creator;
+    private User jobCreator;
     private List<User> applicants;
 }

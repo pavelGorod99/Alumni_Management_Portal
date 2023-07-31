@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Setter
@@ -23,5 +24,9 @@ public class Event {
     private String type;
 
     @ManyToOne
-    private User event_creator;
+    @JoinColumn(name = "event_creator_id")
+    private User eventCreator;
+
+    @OneToMany
+    private List<User> attendance;
 }

@@ -2,6 +2,7 @@ package com.example.Alumni_Management_Portal.services.implementation;
 
 import com.example.Alumni_Management_Portal.entities.ResourceNotFoundException;
 import com.example.Alumni_Management_Portal.entities.User;
+import com.example.Alumni_Management_Portal.entities.UserAlreadyExistsException;
 import com.example.Alumni_Management_Portal.repositories.UserRepository;
 import com.example.Alumni_Management_Portal.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAll() {
+
         return userRepository.findAll();
     }
 
@@ -37,6 +39,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
+        User existingUserByEmail = userRepository.findByEmail(user.getEmail());
+        User existingUserByUsername = userRepository.findByUsername(user.getUsername());
+
+        if(existingUserByEmail != null) {
+            throw new UserAlreadyExistsException("A user is already registered with this email address: " + user.getEmail());
+        }
+
+        if(existingUserByUsername != null) {
+            throw new UserAlreadyExistsException("A user is already registered with this username: " + user.getUsername());
+        }
+
         return userRepository.save(user);
     }
 

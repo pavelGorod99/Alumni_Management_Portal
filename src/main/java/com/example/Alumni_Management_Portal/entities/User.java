@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class User {
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
@@ -24,10 +25,4 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 }
-
-
-
-
-
-
 

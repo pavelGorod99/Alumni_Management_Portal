@@ -5,9 +5,9 @@ import com.example.Alumni_Management_Portal.entities.Profile;
 import java.util.List;
 
 public interface ProfileService {
-    List<Profile> getAllProfiles();
-    Profile getProfileById(int id);
-    Profile createProfile(Profile profile);
-    Profile updateProfile(Profile profile);
-    void deleteProfile(int id);
+    List<Profile> getAll();
+    Profile getById(int id);
+    Profile create(Profile profile);
+    Profile update(Profile profile);
+    void delete(int id);
 }

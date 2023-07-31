@@ -25,24 +25,24 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         return userRepository.findAll();
     }
 
     @Override
-    public User getUserById(int id) {
+    public User getById(int id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
     }
 
     @Override
-    public User createUser(User user) {
+    public User create(User user) {
         return userRepository.save(user);
     }
 
     @Override
-    public User updateUser(User user) {
-        User existingUser = getUserById(user.getId());
+    public User update(User user) {
+        User existingUser = getById(user.getId());
         existingUser.setFirstName(user.getFirstName());
         existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());
@@ -55,8 +55,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(int id) {
-        User user = getUserById(id);
+    public void delete(int id) {
+        User user = getById(id);
         userRepository.delete(user);
     }
 }

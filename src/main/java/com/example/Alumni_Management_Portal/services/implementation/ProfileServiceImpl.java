@@ -16,24 +16,24 @@ public class ProfileServiceImpl implements ProfileService {
     private ProfileRepository profileRepository;
 
     @Override
-    public List<Profile> getAllProfiles() {
+    public List<Profile> getAll() {
         return profileRepository.findAll();
     }
 
     @Override
-    public Profile getProfileById(int id) {
+    public Profile getById(int id) {
         return profileRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found with id " + id));
     }
 
     @Override
-    public Profile createProfile(Profile profile) {
+    public Profile create(Profile profile) {
         return profileRepository.save(profile);
     }
 
     @Override
-    public Profile updateProfile(Profile profile) {
-        Profile existingProfile = getProfileById(profile.getId());
+    public Profile update(Profile profile) {
+        Profile existingProfile = getById(profile.getId());
         existingProfile.setUser(profile.getUser());
         existingProfile.setImagePath(profile.getImagePath());
         existingProfile.setGraduationYear(profile.getGraduationYear());
@@ -45,8 +45,8 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void deleteProfile(int id) {
-        Profile profile = getProfileById(id);
+    public void delete(int id) {
+        Profile profile = getById(id);
         profileRepository.delete(profile);
     }
 }

@@ -16,24 +16,24 @@ public class ContactServiceImpl implements ContactService {
     private ContactRepository contactRepository;
 
     @Override
-    public List<Contact> getAllContacts() {
+    public List<Contact> getAll() {
         return contactRepository.findAll();
     }
 
     @Override
-    public Contact getContactById(int id) {
+    public Contact getById(int id) {
         return contactRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Contact not found with id " + id));
     }
 
     @Override
-    public Contact createContact(Contact contact) {
+    public Contact create(Contact contact) {
         return contactRepository.save(contact);
     }
 
     @Override
-    public Contact updateContact(Contact contact) {
-        Contact existingContact = getContactById(contact.getId());
+    public Contact update(Contact contact) {
+        Contact existingContact = getById(contact.getId());
         existingContact.setUser(contact.getUser());
         existingContact.setPhoneNumber(contact.getPhoneNumber());
         existingContact.setStreet(contact.getStreet());
@@ -44,8 +44,8 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void deleteContact(int id) {
-        Contact contact = getContactById(id);
+    public void delete(int id) {
+        Contact contact = getById(id);
         contactRepository.delete(contact);
     }
 }

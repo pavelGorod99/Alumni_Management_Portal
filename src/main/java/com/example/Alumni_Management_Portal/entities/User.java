@@ -15,11 +15,11 @@ public class User {
     private int id;
     private String firstName;
     private String lastName;
+    @Column(unique = true)
     private String email;
     private String password;
     private Boolean isActive;
     private Boolean isDeleted;
-    private String username;
 
     @OneToOne
     @JoinColumn(name = "role_id")

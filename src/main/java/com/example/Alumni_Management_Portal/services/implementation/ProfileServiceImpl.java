@@ -1,52 +1,66 @@
 package com.example.Alumni_Management_Portal.services.implementation;
 
+import com.example.Alumni_Management_Portal.dto.ProfileDto;
 import com.example.Alumni_Management_Portal.entities.Profile;
 import com.example.Alumni_Management_Portal.entities.ResourceNotFoundException;
 import com.example.Alumni_Management_Portal.repositories.ProfileRepository;
 import com.example.Alumni_Management_Portal.services.ProfileService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfileServiceImpl implements ProfileService {
 
     @Autowired
     private ProfileRepository profileRepository;
+    private final ModelMapper modelMapper;
 
-    @Override
-    public List<Profile> getAllProfiles() {
-        return profileRepository.findAll();
+    public ProfileServiceImpl(ProfileRepository profileRepository, ModelMapper modelMapper) {
+        this.profileRepository = profileRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public Profile getProfileById(int id) {
-        return profileRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Profile not found with id " + id));
+    public List<ProfileDto> getAll() {
+        List<Profile> profiles = profileRepository.findAll();
+        return profiles.stream()
+                .map(profile -> modelMapper.map(profile, ProfileDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Profile createProfile(Profile profile) {
-        return profileRepository.save(profile);
+    public ProfileDto getById(int id) {
+        Optional<Profile> profile= profileRepository.findById(id);
+        if(profile.isPresent()){
+            ProfileDto profileDto= modelMapper.map(profile, ProfileDto.class);
+            return profileDto;
+        } else throw new ResourceNotFoundException("Profile not found with id " + id);
     }
 
     @Override
-    public Profile updateProfile(Profile profile) {
-        Profile existingProfile = getProfileById(profile.getId());
-        existingProfile.setUser(profile.getUser());
-        existingProfile.setImagePath(profile.getImagePath());
-        existingProfile.setGraduationYear(profile.getGraduationYear());
-        existingProfile.setCourse(profile.getCourse());
-        existingProfile.setIndustry(profile.getIndustry());
-        existingProfile.setProfessionalAchievement(profile.getProfessionalAchievement());
-        existingProfile.setEducationDetails(profile.getEducationDetails());
-        return profileRepository.save(existingProfile);
+    public ProfileDto create(ProfileDto profileDto) {
+        Profile profile = modelMapper.map(profileDto, Profile.class);
+        Profile savedProfile = profileRepository.save(profile);
+        return modelMapper.map(savedProfile, ProfileDto.class);
     }
 
+
     @Override
-    public void deleteProfile(int id) {
-        Profile profile = getProfileById(id);
-        profileRepository.delete(profile);
+    public void update(ProfileDto profileDto) {
+        Profile existingProfile = profileRepository.findById(profileDto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found with id " + profileDto.getId()));
+        modelMapper.map(profileDto, existingProfile);
+        profileRepository.save(existingProfile);
+    }
+
+
+    @Override
+    public void delete(int id) {
+        profileRepository.deleteById(id);
     }
 }

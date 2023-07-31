@@ -1,7 +1,8 @@
 package com.example.Alumni_Management_Portal.controllers;
 
-import com.example.Alumni_Management_Portal.entities.User;
-import com.example.Alumni_Management_Portal.entities.UserAlreadyExistsException;
+import com.example.Alumni_Management_Portal.dto.UserDto;
+import com.example.Alumni_Management_Portal.entities.EmailAlreadyExistsException;
+import com.example.Alumni_Management_Portal.entities.ResourceNotFoundException;
 import com.example.Alumni_Management_Portal.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,43 +11,55 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping
+    public List<UserDto> getAll() {
         return userService.getAll();
     }
 
-    @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable int id) {
-
+    @GetMapping("/{id}")
+    public UserDto getById(@PathVariable int id) {
         return userService.getById(id);
     }
 
-    @PostMapping("/users")
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody UserDto userDto) {
         try {
-            User newUser = userService.create(user);
-            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
-        } catch (UserAlreadyExistsException e) {
+            UserDto newUserDto = userService.create(userDto);
+            return new ResponseEntity<>(newUserDto, HttpStatus.CREATED);
+        } catch (EmailAlreadyExistsException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping("/users/{id}")
-    public User updateUser(@PathVariable int id, @RequestBody User user) {
-        user.setId(id);
-        return userService.update(user);
+    @PutMapping
+    public ResponseEntity<?> update(@RequestBody UserDto userDto) {
+        try {
+            userService.update(userDto);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
-    @DeleteMapping("/users/{id}")
-    public void deleteUser(@PathVariable int id) {
-
-        userService.delete(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable int id) {
+        try {
+            userService.delete(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
-
 }

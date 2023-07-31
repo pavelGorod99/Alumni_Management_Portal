@@ -20,8 +20,6 @@ public class User {
     private String password;
     private Boolean isActive;
     private Boolean isDeleted;
-    @Column(unique = true)
-    private String username;
 
     @OneToOne
     @JoinColumn(name = "role_id")

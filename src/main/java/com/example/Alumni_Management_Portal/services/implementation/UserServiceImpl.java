@@ -1,75 +1,65 @@
 package com.example.Alumni_Management_Portal.services.implementation;
 
+import com.example.Alumni_Management_Portal.dto.UserDto;
+import com.example.Alumni_Management_Portal.entities.EmailAlreadyExistsException;
 import com.example.Alumni_Management_Portal.entities.ResourceNotFoundException;
 import com.example.Alumni_Management_Portal.entities.User;
-import com.example.Alumni_Management_Portal.entities.UserAlreadyExistsException;
 import com.example.Alumni_Management_Portal.repositories.UserRepository;
 import com.example.Alumni_Management_Portal.services.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-
-
-import com.example.Alumni_Management_Portal.entities.User;
-import com.example.Alumni_Management_Portal.repositories.UserRepository;
-import com.example.Alumni_Management_Portal.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
+
     @Autowired
-    private UserRepository userRepository;
-
-    @Override
-    public List<User> getAll() {
-
-        return userRepository.findAll();
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
+        this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public User getById(int id) {
-        return userRepository.findById(id)
+    public List<UserDto> getAll() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> modelMapper.map(user, UserDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserDto getById(int id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
+        return modelMapper.map(user, UserDto.class);
     }
 
     @Override
-    public User create(User user) {
-        User existingUserByEmail = userRepository.findByEmail(user.getEmail());
-        User existingUserByUsername = userRepository.findByUsername(user.getUsername());
-
-        if(existingUserByEmail != null) {
-            throw new UserAlreadyExistsException("A user is already registered with this email address: " + user.getEmail());
+    public UserDto create(UserDto userDto) {
+        User user = modelMapper.map(userDto, User.class);
+        if(userRepository.findByEmail(user.getEmail()) != null) {
+            throw new EmailAlreadyExistsException("A user is already registered with this email address: " + user.getEmail());
         }
-
-        if(existingUserByUsername != null) {
-            throw new UserAlreadyExistsException("A user is already registered with this username: " + user.getUsername());
-        }
-
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return modelMapper.map(savedUser, UserDto.class);
     }
 
     @Override
-    public User update(User user) {
-        User existingUser = getById(user.getId());
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setEmail(user.getEmail());
-        existingUser.setPassword(user.getPassword());
-        existingUser.setRole(user.getRole());
-        existingUser.setIsActive(user.getIsActive());
-        existingUser.setIsDeleted(user.getIsDeleted());
-        existingUser.setUsername(user.getUsername());
-        return userRepository.save(existingUser);
+    public void update(UserDto userDto) {
+        User existingUser = userRepository.findById(userDto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userDto.getId()));
+        modelMapper.map(userDto, existingUser);
+        userRepository.save(existingUser);
     }
 
     @Override
     public void delete(int id) {
-        User user = getById(id);
-        userRepository.delete(user);
+        userRepository.deleteById(id);
     }
 }

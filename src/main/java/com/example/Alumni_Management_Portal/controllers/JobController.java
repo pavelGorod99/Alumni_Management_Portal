@@ -1,26 +1,33 @@
 package com.example.Alumni_Management_Portal.controllers;
 
 import com.example.Alumni_Management_Portal.dto.JobDto;
-import com.example.Alumni_Management_Portal.services.implementation.JobServiceImpl;
+import com.example.Alumni_Management_Portal.services.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(name = "/jobs")
 public class JobController {
 
-    private JobServiceImpl jobService;
+    private JobService jobService;
 
     @Autowired
-    public JobController(JobServiceImpl jobService) {
+    public JobController(JobService jobService) {
         this.jobService = jobService;
     }
 
     @PostMapping
     private void create(@RequestBody JobDto jobDto) {
         jobService.create(jobDto);
+    }
+
+    @PutMapping(path = "/apply")
+    public void applyForJob(@RequestParam int userId, @RequestParam int jobId) {
+        jobService.applyForJob(userId, jobId);
+    }
+
+    @PutMapping(path = "/close-it/{id}")
+    public void closeTheJob(@PathVariable int id) {
+        jobService.closeTheJob(id);
     }
 }

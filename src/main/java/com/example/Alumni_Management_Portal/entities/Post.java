@@ -4,28 +4,27 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Date;
 
 @Entity
 @Setter
 @Getter
-public class Job {
+public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String company;
     private String title;
+    private Date createdDate;
     private String description;
-    private String location;
-    private String type;
-    private boolean isAvailable = true;
+    private String imagePath;
+
+    @OneToOne
+    @JoinColumn(name = "type_id")
+    private PostType postType;
 
     @ManyToOne
-    @JoinColumn(name = "job_creator_id")
-    private User job_creator;
-
-    @OneToMany
-    private List<User> applicants;
+    @JoinColumn(name = "administrator_id")
+    private User creator;
 }

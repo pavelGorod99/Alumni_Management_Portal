@@ -8,4 +8,5 @@ public interface JobService {
     void create(JobDto jobDto);
     List<JobDto> getAll();
     void applyForJob(int userId, int jobId);
+    void closeTheJob(int jobId);
 }

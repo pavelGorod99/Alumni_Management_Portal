@@ -21,7 +21,7 @@ public class User {
     private Boolean isActive;
     private Boolean isDeleted;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "role_id")
     private Role role;
 }

@@ -25,6 +25,7 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAll() {
+
         return userService.getAll();
     }
 
@@ -36,11 +37,17 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody UserDto userDto) {
         try {
-            UserDto newUserDto = userService.create(userDto);
+            String newUserDto = userService.create(userDto);
             return new ResponseEntity<>(newUserDto, HttpStatus.CREATED);
         } catch (EmailAlreadyExistsException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/authenticateUsers")
+    public String authenticateUser(@RequestBody UserDto userDto){
+
+        return userService.authenticateUser(userDto);
     }
 
     @PutMapping

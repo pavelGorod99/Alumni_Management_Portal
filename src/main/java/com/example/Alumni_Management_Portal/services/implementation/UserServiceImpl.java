@@ -8,9 +8,11 @@ import com.example.Alumni_Management_Portal.repositories.UserRepository;
 import com.example.Alumni_Management_Portal.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,14 +42,32 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(user, UserDto.class);
     }
 
+    public String authenticateUser(UserDto userDto) throws ResourceNotFoundException{
+        BCryptPasswordEncoder bcrypt= new BCryptPasswordEncoder();
+        Optional<User> opUser= userRepository.findById(userDto.getId());
+        if(opUser.isPresent())
+        {
+            User dbUser= opUser.get();
+            if(bcrypt.matches(userDto.getPassword(), dbUser.getPassword())){
+                return "Authenticated User";
+            } else{
+                return "Incorrect Password";
+            }
+        }
+        throw new ResourceNotFoundException("User is not found");
+    }
+
     @Override
-    public UserDto create(UserDto userDto) {
+    public String create(UserDto userDto) {
         User user = modelMapper.map(userDto, User.class);
         if(userRepository.findByEmail(user.getEmail()) != null) {
             throw new EmailAlreadyExistsException("A user is already registered with this email address: " + user.getEmail());
         }
+        BCryptPasswordEncoder bcrypt= new BCryptPasswordEncoder();
+        String encryptedPwd= bcrypt.encode(user.getPassword());
+        user.setPassword(encryptedPwd);
         User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDto.class);
+        return savedUser.getFirstName() + "added to database successfully";
     }
 
     @Override

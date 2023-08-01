@@ -1,13 +1,14 @@
 package com.example.Alumni_Management_Portal.services;
 
+import com.example.Alumni_Management_Portal.dto.ContactDto;
 import com.example.Alumni_Management_Portal.entities.Contact;
 
 import java.util.List;
 
 public interface ContactService {
-    List<Contact> getAll();
-    Contact getById(int id);
-    Contact create(Contact contact);
-    Contact update(Contact contact);
+    List<ContactDto> getAll();
+    ContactDto getById(int id);
+    ContactDto create(ContactDto contactDto);
+    void update(ContactDto contactDto);
     void delete(int id);
 }

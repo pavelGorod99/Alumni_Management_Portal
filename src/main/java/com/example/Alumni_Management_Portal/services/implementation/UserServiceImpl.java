@@ -1,7 +1,10 @@
 package com.example.Alumni_Management_Portal.services.implementation;
 
+import com.example.Alumni_Management_Portal.dto.JobDto;
+import com.example.Alumni_Management_Portal.dto.LoginRequestDto;
 import com.example.Alumni_Management_Portal.dto.UserDto;
 import com.example.Alumni_Management_Portal.entities.EmailAlreadyExistsException;
+import com.example.Alumni_Management_Portal.entities.Job;
 import com.example.Alumni_Management_Portal.entities.ResourceNotFoundException;
 import com.example.Alumni_Management_Portal.entities.User;
 import com.example.Alumni_Management_Portal.repositories.UserRepository;
@@ -35,20 +38,33 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public UserDto getById(int id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
-        return modelMapper.map(user, UserDto.class);
+    public User getEntityById(int id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return user.get();
+        } else return null;
     }
 
-    public String authenticateUser(UserDto userDto) throws ResourceNotFoundException{
+    @Override
+    public UserDto getById(int id) {
+        User user = getEntityById(id);
+
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found with id " + id);
+        }
+
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        return userDto;
+    }
+
+    @Override
+    public String authenticateUser(LoginRequestDto loginRequestDto) throws ResourceNotFoundException{
         BCryptPasswordEncoder bcrypt= new BCryptPasswordEncoder();
-        Optional<User> opUser= userRepository.findById(userDto.getId());
+        Optional<User> opUser= userRepository.findByEmail(loginRequestDto.getEmail());
         if(opUser.isPresent())
         {
             User dbUser= opUser.get();
-            if(bcrypt.matches(userDto.getPassword(), dbUser.getPassword())){
+            if(bcrypt.matches(loginRequestDto.getPassword(), dbUser.getPassword())){
                 return "Authenticated User";
             } else{
                 return "Incorrect Password";
@@ -57,17 +73,20 @@ public class UserServiceImpl implements UserService {
         throw new ResourceNotFoundException("User is not found");
     }
 
+
     @Override
     public String create(UserDto userDto) {
         User user = modelMapper.map(userDto, User.class);
-        if(userRepository.findByEmail(user.getEmail()) != null) {
+        if(userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("A user is already registered with this email address: " + user.getEmail());
         }
         BCryptPasswordEncoder bcrypt= new BCryptPasswordEncoder();
         String encryptedPwd= bcrypt.encode(user.getPassword());
         user.setPassword(encryptedPwd);
+        System.out.println("User email: " + user.getEmail());
+        System.out.println("User id: " + user.getId());
         User savedUser = userRepository.save(user);
-        return savedUser.getFirstName() + "added to database successfully";
+        return savedUser.getFirstName() + " added to database successfully";
     }
 
     @Override
@@ -79,7 +98,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(int id) {
-        userRepository.deleteById(id);
+    public UserDto addJobExperience(int userId, JobDto jobDto) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Job job = new Job();
+        job.setCompany(jobDto.getCompany());
+        job.setTitle(jobDto.getTitle());
+        job.setDescription(jobDto.getDescription());
+        job.setLocation(jobDto.getLocation());
+        job.setType(jobDto.getType());
+
+        user.getJobExperiences().add(job);
+        User updatedUser = userRepository.save(user);
+
+        return modelMapper.map(updatedUser, UserDto.class);
     }
+
+
+    @Override
+    public void delete(int id) throws ResourceNotFoundException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No user found with id " + id));
+
+        user.setIsDeleted(true);
+        userRepository.save(user);
+    }
+
 }

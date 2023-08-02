@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Setter
@@ -12,7 +15,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     private String firstName;
     private String lastName;
     @Column(unique = true)
@@ -21,8 +24,15 @@ public class User {
     private Boolean isActive;
     private Boolean isDeleted;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+//    @Enumerated(EnumType.STRING)
+//    private Almuni almuni;
+
+
+    @OneToMany(mappedBy = "job_creator", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Job> jobExperiences = new ArrayList<>();
+
 }
 

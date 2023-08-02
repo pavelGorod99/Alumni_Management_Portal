@@ -1,5 +1,7 @@
 package com.example.Alumni_Management_Portal.services;
 
+import com.example.Alumni_Management_Portal.dto.JobDto;
+import com.example.Alumni_Management_Portal.dto.LoginRequestDto;
 import com.example.Alumni_Management_Portal.dto.UserDto;
 import com.example.Alumni_Management_Portal.entities.User;
 
@@ -11,5 +13,6 @@ public interface UserService {
     String create(UserDto userDto);
     void update(UserDto userDto);
     void delete(int id);
-    String authenticateUser(UserDto userDto);
+    String authenticateUser(LoginRequestDto loginRequestDto);
+    UserDto addJobExperience(int userId, JobDto jobDto);
 }

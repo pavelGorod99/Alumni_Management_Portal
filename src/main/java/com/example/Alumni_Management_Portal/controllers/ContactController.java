@@ -25,9 +25,9 @@ public class ContactController {
         return ResponseEntity.ok(contacts);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ContactDto> getContactById(@PathVariable int id) {
-        ContactDto contact = contactService.getById(id);
+    @GetMapping("/{userId}")
+    public ResponseEntity<ContactDto> getContactByUserId(@PathVariable int userId){
+        ContactDto contact = contactService.getByUserId(userId);
         return ResponseEntity.ok(contact);
     }
 

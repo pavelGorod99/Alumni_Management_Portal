@@ -1,5 +1,7 @@
 package com.example.Alumni_Management_Portal.controllers;
 
+import com.example.Alumni_Management_Portal.dto.JobDto;
+import com.example.Alumni_Management_Portal.dto.LoginRequestDto;
 import com.example.Alumni_Management_Portal.dto.UserDto;
 import com.example.Alumni_Management_Portal.entities.EmailAlreadyExistsException;
 import com.example.Alumni_Management_Portal.entities.ResourceNotFoundException;
@@ -45,19 +47,26 @@ public class UserController {
     }
 
     @PostMapping("/authenticateUsers")
-    public String authenticateUser(@RequestBody UserDto userDto){
-
-        return userService.authenticateUser(userDto);
+    public String authenticateUser(@RequestBody LoginRequestDto loginRequestDto){
+        return userService.authenticateUser(loginRequestDto);
     }
+
 
     @PutMapping
     public ResponseEntity<?> update(@RequestBody UserDto userDto) {
+        System.out.println("I am here");
         try {
             userService.update(userDto);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PostMapping("/{id}/job-experiences")
+    public ResponseEntity<UserDto> addJobExperience(@PathVariable int id, @RequestBody JobDto jobDto) {
+        UserDto userDto = userService.addJobExperience(id, jobDto);
+        return ResponseEntity.ok(userDto);
     }
 
     @DeleteMapping("/{id}")

@@ -5,8 +5,8 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class UserProfileDto {
+public class SurveyQuestionDto {
+
     private int id;
-    private String firstName;
-    private String lastName;
+    private String questions;
 }

@@ -1,42 +1,81 @@
 package com.example.Alumni_Management_Portal.controllers;
 
-import com.example.Alumni_Management_Portal.entities.User;
+import com.example.Alumni_Management_Portal.dto.JobDto;
+import com.example.Alumni_Management_Portal.dto.LoginRequestDto;
+import com.example.Alumni_Management_Portal.dto.UserDto;
+import com.example.Alumni_Management_Portal.entities.EmailAlreadyExistsException;
+import com.example.Alumni_Management_Portal.entities.ResourceNotFoundException;
 import com.example.Alumni_Management_Portal.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
-
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable int id) {
-        return userService.getUserById(id);
+    @GetMapping
+    public List<UserDto> getAll() {
+
+        return userService.getAll();
     }
 
-    @PostMapping("/users")
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    @GetMapping("/{id}")
+    public UserDto getById(@PathVariable int id) {
+        return userService.getById(id);
     }
 
-    @PutMapping("/users/{id}")
-    public User updateUser(@PathVariable int id, @RequestBody User user) {
-        user.setId(id);
-        return userService.updateUser(user);
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody UserDto userDto) {
+        try {
+            String newUserDto = userService.create(userDto);
+            return new ResponseEntity<>(newUserDto, HttpStatus.CREATED);
+        } catch (EmailAlreadyExistsException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @DeleteMapping("/users/{id}")
-    public void deleteUser(@PathVariable int id) {
-        userService.deleteUser(id);
+    @PostMapping("/authenticateUsers")
+    public String authenticateUser(@RequestBody LoginRequestDto loginRequestDto){
+        return userService.authenticateUser(loginRequestDto);
     }
 
+
+    @PutMapping
+    public ResponseEntity<?> update(@RequestBody UserDto userDto) {
+        System.out.println("I am here");
+        try {
+            userService.update(userDto);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/{id}/job-experiences")
+    public ResponseEntity<UserDto> addJobExperience(@PathVariable int id, @RequestBody JobDto jobDto) {
+        UserDto userDto = userService.addJobExperience(id, jobDto);
+        return ResponseEntity.ok(userDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable int id) {
+        try {
+            userService.delete(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
 }

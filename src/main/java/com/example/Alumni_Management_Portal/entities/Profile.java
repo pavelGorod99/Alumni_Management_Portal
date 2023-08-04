@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Entity
 @Setter
 @Getter
@@ -15,7 +14,7 @@ public class Profile {
     private int id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     private String imagePath;

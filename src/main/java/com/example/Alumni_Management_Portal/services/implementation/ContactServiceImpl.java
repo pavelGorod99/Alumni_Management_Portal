@@ -48,6 +48,16 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
+    public ContactDto getByUserId(int userId) {
+        Contact contact = contactRepository.findByUserId(userId);
+        if (contact != null) {
+            return modelMapper.map(contact, ContactDto.class);
+        } else {
+            throw new ResourceNotFoundException("Contact not found for user id " + userId);
+        }
+    }
+
+    @Override
     public ContactDto create(ContactDto contactDto) {
         Contact contact = modelMapper.map(contactDto, Contact.class);
         Contact savedContact = contactRepository.save(contact);

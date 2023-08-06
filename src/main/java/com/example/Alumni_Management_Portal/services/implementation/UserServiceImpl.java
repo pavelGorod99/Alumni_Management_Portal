@@ -13,12 +13,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@CrossOrigin
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -73,6 +75,14 @@ public class UserServiceImpl implements UserService {
         throw new ResourceNotFoundException("User is not found");
     }
 
+    public void logOut(int id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setIsActive(false);
+            userRepository.save(user);
+        }
+    }
 
     @Override
     public String create(UserDto userDto) {

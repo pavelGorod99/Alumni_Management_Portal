@@ -18,12 +18,16 @@ public class Job {
     private String company;
     private String title;
     private String description;
-    private String location;
-    private String type;
 
     @ManyToOne
-    @JoinColumn(name = "job_creator_id")
-    private User job_creator;
+    @JoinColumn(name = "location_id")
+    private Address location;
+    private String type;
+    private boolean isAvailable = true;
+
+    @ManyToOne
+    @JoinColumn(name = "job_creator_id", nullable = false)
+    private User jobCreator;
 
     @OneToMany
     private List<User> applicants;

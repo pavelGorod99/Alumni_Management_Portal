@@ -1,5 +1,6 @@
 package com.example.Alumni_Management_Portal.dto;
 
+import com.example.Alumni_Management_Portal.entities.Address;
 import com.example.Alumni_Management_Portal.entities.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ public class JobDto {
     private String company;
     private String title;
     private String description;
-    private String location;
+    private Address location;
     private String type;
     private User jobCreator;
     private List<User> applicants;

@@ -1,14 +1,17 @@
 package com.example.Alumni_Management_Portal.services.implementation;
 
 import com.example.Alumni_Management_Portal.dto.ProfileDto;
+import com.example.Alumni_Management_Portal.dto.UserDto;
 import com.example.Alumni_Management_Portal.entities.Profile;
 import com.example.Alumni_Management_Portal.entities.ResourceNotFoundException;
 import com.example.Alumni_Management_Portal.repositories.ProfileRepository;
 import com.example.Alumni_Management_Portal.services.ProfileService;
+import jakarta.servlet.http.HttpSession;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +22,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Autowired
     private ProfileRepository profileRepository;
     private final ModelMapper modelMapper;
+    private HttpSession httpSession;
 
     public ProfileServiceImpl(ProfileRepository profileRepository, ModelMapper modelMapper) {
         this.profileRepository = profileRepository;
@@ -52,15 +56,30 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void update(ProfileDto profileDto) {
-        Profile existingProfile = profileRepository.findById(profileDto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Profile not found with id " + profileDto.getId()));
-        modelMapper.map(profileDto, existingProfile);
-        profileRepository.save(existingProfile);
+        UserDto loggedInUser = (UserDto) httpSession.getAttribute("user");
+
+        if (loggedInUser == null) { // If no user is logged in
+            throw new ResourceNotFoundException("No user is logged in");
+        }
+
+        if (loggedInUser.getRole().getRole().equals("Student") || loggedInUser.getRole().getRole().equals("Faculty")) {
+            if (!loggedInUser.getId().equals(profileDto.getUser().getId())) {
+                throw new ResourceNotFoundException("You are not authorized to edit this profile");
+            }
+
+            Profile existingProfile = profileRepository.findById(profileDto.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Profile not found with id " + profileDto.getId()));
+            modelMapper.map(profileDto, existingProfile);
+            profileRepository.save(existingProfile);
+        } else {
+            throw new ResourceNotFoundException("Only Faculty or Students can edit profile information");
+        }
     }
 
 
     @Override
     public void delete(int id) {
+
         profileRepository.deleteById(id);
     }
 }

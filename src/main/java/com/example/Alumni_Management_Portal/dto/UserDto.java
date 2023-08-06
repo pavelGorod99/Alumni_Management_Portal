@@ -4,6 +4,9 @@ import com.example.Alumni_Management_Portal.entities.Role;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Setter
 @Getter
 public class UserDto {
@@ -14,7 +17,8 @@ public class UserDto {
     private String password;
     private Boolean isActive = false;
     private Boolean isDeleted = false;
-    private String username;
-//    private Role role;
-    private Almuni almuni;
+    private Role role;
+    //private Almuni almuni;
+    private List<String> jobExperiences;
+
 }

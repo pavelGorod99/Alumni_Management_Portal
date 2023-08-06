@@ -14,4 +14,5 @@ public class Role {
     private int id;
     @Column(unique = true)
     private String role;
+
 }

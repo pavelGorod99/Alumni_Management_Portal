@@ -14,5 +14,5 @@ public interface UserService {
     void update(UserDto userDto);
     void delete(int id);
     String authenticateUser(LoginRequestDto loginRequestDto);
-    UserDto addJobExperience(int userId, JobDto jobDto);
+    void addJobExperience(Integer id, String jobExperience);
 }

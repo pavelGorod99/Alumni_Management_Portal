@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public UserDto getById(@PathVariable int id) {
+    public UserDto getById(@PathVariable Integer id) {
         return userService.getById(id);
     }
 
@@ -46,7 +46,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/authenticateUsers")
+    @PostMapping("/authenticate")
     public String authenticateUser(@RequestBody LoginRequestDto loginRequestDto){
         return userService.authenticateUser(loginRequestDto);
     }
@@ -63,10 +63,10 @@ public class UserController {
         }
     }
 
-    @PostMapping("/{id}/job-experiences")
-    public ResponseEntity<UserDto> addJobExperience(@PathVariable int id, @RequestBody JobDto jobDto) {
-        UserDto userDto = userService.addJobExperience(id, jobDto);
-        return ResponseEntity.ok(userDto);
+    @PostMapping("/{id}/jobExperiences")
+    public ResponseEntity<Void> addJobExperience(@PathVariable Integer id, @RequestBody String jobExperience) {
+        userService.addJobExperience(id, jobExperience);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

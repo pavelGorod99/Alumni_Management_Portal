@@ -3,10 +3,8 @@ package com.example.Alumni_Management_Portal.services.implementation;
 import com.example.Alumni_Management_Portal.dto.JobDto;
 import com.example.Alumni_Management_Portal.dto.LoginRequestDto;
 import com.example.Alumni_Management_Portal.dto.UserDto;
-import com.example.Alumni_Management_Portal.entities.EmailAlreadyExistsException;
-import com.example.Alumni_Management_Portal.entities.Job;
-import com.example.Alumni_Management_Portal.entities.ResourceNotFoundException;
-import com.example.Alumni_Management_Portal.entities.User;
+import com.example.Alumni_Management_Portal.entities.*;
+import com.example.Alumni_Management_Portal.repositories.RoleRepository;
 import com.example.Alumni_Management_Portal.repositories.UserRepository;
 import com.example.Alumni_Management_Portal.services.UserService;
 import org.modelmapper.ModelMapper;
@@ -24,11 +22,13 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -40,20 +40,10 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    public User getEntityById(int id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return user.get();
-        } else return null;
-    }
-
     @Override
     public UserDto getById(int id) {
-        User user = getEntityById(id);
-
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found with id " + id);
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
 
         UserDto userDto = modelMapper.map(user, UserDto.class);
         return userDto;
@@ -90,6 +80,15 @@ public class UserServiceImpl implements UserService {
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("A user is already registered with this email address: " + user.getEmail());
         }
+        String roleName = userDto.getRole().getRole();
+        Role role = roleRepository.findByRoleIgnoreCase(roleName)
+                .orElseGet(() -> {
+                    Role newRole = new Role();
+                    newRole.setRole(roleName);
+                    return roleRepository.save(newRole);
+                });
+
+        user.setRole(role);
         BCryptPasswordEncoder bcrypt= new BCryptPasswordEncoder();
         String encryptedPwd= bcrypt.encode(user.getPassword());
         user.setPassword(encryptedPwd);
@@ -107,21 +106,22 @@ public class UserServiceImpl implements UserService {
         userRepository.save(existingUser);
     }
 
+
     @Override
-    public UserDto addJobExperience(int userId, JobDto jobDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public void addJobExperience(Integer id, String jobExperience) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
+        if (user.getRole().getRole().equalsIgnoreCase("Student")) {
+            List<String> jobExperiences = user.getJobExperiences();
+            jobExperiences.add(jobExperience);
+            user.setJobExperiences(jobExperiences);
 
-        Job job = new Job();
-        job.setCompany(jobDto.getCompany());
-        job.setTitle(jobDto.getTitle());
-        job.setDescription(jobDto.getDescription());
-        job.setLocation(jobDto.getLocation());
-        job.setType(jobDto.getType());
+            userRepository.save(user);
+        }else{
+            System.out.println("Role of the user: " + user.getRole().getRole());
+            throw new RuntimeException("Only students can add job experiences");
+        }
 
-        user.getJobExperiences().add(job);
-        User updatedUser = userRepository.save(user);
-
-        return modelMapper.map(updatedUser, UserDto.class);
     }
 
 

@@ -1,8 +1,12 @@
 package com.example.Alumni_Management_Portal.controllers;
 
 import com.example.Alumni_Management_Portal.dto.ProfileDto;
+import com.example.Alumni_Management_Portal.dto.UserDto;
+import com.example.Alumni_Management_Portal.entities.ResourceNotFoundException;
 import com.example.Alumni_Management_Portal.services.ProfileService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,11 +41,15 @@ public class ProfileController {
         return ResponseEntity.ok(createdProfile);
     }
 
-    @PutMapping
-    public ResponseEntity<Void> updateProfile(@RequestBody ProfileDto profileDto) {
+   @PutMapping
+public ResponseEntity<String> updateProfile(@RequestBody ProfileDto profileDto) {
+    try {
         profileService.update(profileDto);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>("Profile updated successfully", HttpStatus.OK);
+    } catch (ResourceNotFoundException ex) {
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProfile(@PathVariable int id) {

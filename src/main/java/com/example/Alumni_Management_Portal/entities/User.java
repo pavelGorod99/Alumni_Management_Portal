@@ -24,6 +24,9 @@ public class User {
     private Boolean isActive;
     private Boolean isDeleted;
 
+    @OneToOne
+    private Profile profile;
+
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
@@ -31,8 +34,7 @@ public class User {
 //    private Almuni almuni;
 
 
-    @OneToMany(mappedBy = "job_creator", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Job> jobExperiences = new ArrayList<>();
-
+    @ElementCollection
+    private List<String> jobExperiences = new ArrayList<>();
 }
 

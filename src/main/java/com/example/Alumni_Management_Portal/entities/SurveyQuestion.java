@@ -13,6 +13,7 @@ import java.util.List;
 public class SurveyQuestion {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String questions;

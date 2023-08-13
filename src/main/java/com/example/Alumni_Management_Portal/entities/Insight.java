@@ -1,12 +1,11 @@
 package com.example.Alumni_Management_Portal.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+
 
 @Getter
 @Setter
@@ -14,12 +13,13 @@ import java.time.LocalDateTime;
 public class Insight {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String title;
     private Boolean surveyStatus;
-    private LocalDateTime openDate;
-    private LocalDateTime closeDate;
+    private LocalDate openDate;
+    private LocalDate closeDate;
 
     @ManyToOne
     private User insightCreator;

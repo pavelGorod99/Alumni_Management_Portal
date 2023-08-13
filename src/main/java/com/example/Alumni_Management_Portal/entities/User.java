@@ -24,5 +24,6 @@ public class User {
     @OneToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
 }
 

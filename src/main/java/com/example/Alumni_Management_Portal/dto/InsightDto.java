@@ -2,6 +2,7 @@ package com.example.Alumni_Management_Portal.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Setter
@@ -12,6 +13,6 @@ public class InsightDto {
 
         private String title;
         private Boolean surveyStatus;
-        private LocalDateTime openDate;
-        private LocalDateTime closeDate;
+        private LocalDate openDate;
+        private LocalDate closeDate;
 }
